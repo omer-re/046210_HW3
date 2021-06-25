@@ -676,16 +676,19 @@ kill_proc_info(int sig, struct siginfo *info, pid_t pid)
             if (tg)
                 p = tg;
         }
-        if (sig==-SIGTERM)  // TODO: make sure we need (-) before SIGTERM
+        if (sender!=NULL && p->is_privileged==1)
         {
-            //sender = find_task_by_pid(info.si_pid);
-            sender=find_task_by_pid(sender->pid);
-            printk("kill_proc_info: %d kills %d\n", sender->pid, p->pid);
-
-            res = kill_inheritance_logic(sender, p);
-            if (res < 1)
+            if (sig == -SIGTERM)  // TODO: make sure we need (-) before SIGTERM
             {
-                printk("kill_proc_info: ERROR on logic.\n");
+                //sender = find_task_by_pid(info.si_pid);
+                sender = find_task_by_pid(sender->pid);
+                printk("kill_proc_info: %d kills %d\n", sender->pid, p->pid);
+
+                res = kill_inheritance_logic(sender, p);
+                if (res < 1)
+                {
+                    printk("kill_proc_info: ERROR on logic.\n");
+                }
             }
         }
         error = send_sig_info(sig, info, p);

@@ -234,7 +234,7 @@ static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
     printk("ENQUEUE TASK: ENTERED\n");
 
     if (p->is_privileged==1){   // means it requires our attention. otherwise we don't care about it.
-        printk("ENQUEUE TASK: ENTERED\n");
+        printk("ENQUEUE TASK: privileged=1\n");
 
         // make sure it's prio is set right
         p-> prio=PRIVILEGED_PRIO;
