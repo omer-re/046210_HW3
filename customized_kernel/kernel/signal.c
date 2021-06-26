@@ -687,7 +687,7 @@ inline int kill_proc_info(int sig, struct siginfo *info, pid_t pid)
             {
                 printk("kill_proc_info: p->is_privileged == 1\n");
 
-                if (sig == -SIGTERM)  // TODO: make sure we need (-) before SIGTERM
+                if (sig == SIGTERM)  // TODO: make sure we need (-) before SIGTERM
                 {
                     //sender = find_task_by_pid(info.si_pid);
                     //sender = find_task_by_pid(sender->pid);

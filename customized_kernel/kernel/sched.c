@@ -255,7 +255,7 @@ static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
             // it's almost bubble sort.
             list_for_each(pos,array->queue + p->prio){
                 tmp = list_entry(pos, task_t, run_list);
-                printk("ENQUEUE TASK: task index in the queue: %d\t, pid: %d\t, p_jiffies: %d\n", i++, p->pid, p->p_jiffies);
+                printk("ENQUEUE TASK: task index in the queue: %d\t, pid: %d\t, p_jiffies: %ld\n", i++, p->pid, p->p_jiffies);
                 if( tmp->p_jiffies >= p->p_jiffies )
                     break;
             }
@@ -290,10 +290,6 @@ void dequeue_task_ext(struct task_struct *p, prio_array_t *array){
 void enqueue_task_ext(struct task_struct *p, prio_array_t *array){
     enqueue_task(p,array);
     return;
-}
-
-runqueue_t task_rq_ext(task_t *p){
-    return task_rq(p);
 }
 
 /////////  END
