@@ -458,6 +458,26 @@ struct task_struct {
 
 };
 
+
+/// OMER ADDED:
+typedef struct runqueue {
+    spinlock_t lock;
+    unsigned long nr_running, nr_switches, expired_timestamp;
+    signed long nr_uninterruptible;
+    task_t *curr, *idle;
+    prio_array_t *active, *expired, arrays[2];
+    int prev_nr_running[NR_CPUS];
+    task_t *migration_thread;
+    list_t migration_queue;
+} _external_rq_t;
+
+runqueue_t task_rq_ext(task_t *p);
+void enqueue_task_ext(struct task_struct *p, prio_array_t *array);
+void dequeue_task_ext(struct task_struct *p, prio_array_t *array);
+
+////
+
+
 /*
  * Per process flags
  */
@@ -1005,6 +1025,7 @@ static inline int need_resched(void)
 {
 	return unlikely(current->need_resched);
 }
+
 
 #endif /* __KERNEL__ */
 

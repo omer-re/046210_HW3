@@ -280,6 +280,24 @@ static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
 
 }
 
+//// OMER ADDED:
+//// EXTERNAL API FOR FUNCTIONS
+void dequeue_task_ext(struct task_struct *p, prio_array_t *array){
+    dequeue_task(p,array);
+    return;
+}
+
+void enqueue_task_ext(struct task_struct *p, prio_array_t *array){
+    enqueue_task(p,array);
+    return;
+}
+
+runqueue_t task_rq_ext(task_t *p){
+    return task_rq(p);
+}
+
+/////////  END
+
 static inline int effective_prio(task_t *p)
 {
 	int bonus, prio;

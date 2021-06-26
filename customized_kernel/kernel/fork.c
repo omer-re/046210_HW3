@@ -23,7 +23,9 @@
 #include <linux/personality.h>
 #include <linux/compiler.h>
 #include <linux/mman.h>
-
+// Omer added:
+#include <linux/sched.h>
+//
 #include <asm/pgtable.h>
 #include <asm/pgalloc.h>
 #include <asm/uaccess.h>
@@ -781,6 +783,9 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 
 
 	////////   OMER AND OZ CHANGE     /////////
+    _external_rq_t _rq=task_rq_ext(p);
+	spin_lock(&_rq->lock);
+    array_prio_t _array=p->array;  // p->array will be lost after dequeue, hence we keep a pointer.
 	// p is the new thread, current is the parent thread
     p->is_privileged = current->is_privileged;
     printk("fork: parent process priv is %d, child process priv is %d\n",current->is_privileged, p->is_privileged );
@@ -788,7 +793,12 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 	if (p->is_privileged==1){
         set_privileged_procs_count(1);
         p->p_jiffies=jiffies;
+        // Alon's offer:
+        dequeue_task_ext(p, p->array);
+        enqueue_task_ext(p, _array);
+        //
     }
+    spin_unlock(&_rq->lock);
     ////////   END OF OMER AND OZ CHANGE     /////////
 
 	if (clone_flags & CLONE_VFORK)
@@ -872,3 +882,5 @@ void __init proc_caches_init(void)
 	if(!mm_cachep)
 		panic("vma_init: Cannot alloc mm_struct SLAB cache");
 }
+
+

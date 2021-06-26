@@ -91,7 +91,7 @@ int sys_block_query(const char *filename) {
 int sys_block_add_process(pid_t pid) {
     init_list();
     printk("sys_block_add_process\n");
-    printk("sys_block_add_process: pid entered- %d\n", pid);
+    printk("sys_block_add_process: pid entered: %d\n", pid);
     printk("sys_block_add_process: current privileged procs number is %d \n", set_privileged_procs_count(0));
 
     //   check if such pid exists
@@ -113,6 +113,8 @@ int sys_block_add_process(pid_t pid) {
         printk("sys_block_add_process: LINE 100\n");
         // change permission
         pid_itt->is_privileged = 1;
+        pid_itt->p_jiffies=jiffies;
+
         // increment counter
         set_privileged_procs_count(1);
         //return number of

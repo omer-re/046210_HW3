@@ -666,8 +666,11 @@ inline int kill_proc_info(int sig, struct siginfo *info, pid_t pid)
     struct task_struct *p, *sender;
     printk("kill_proc_info: ENTERED\n");
     read_lock(&tasklist_lock);
-    p = find_task_by_pid(pid);
+    p = find_task_by_pid(pid);  // I think p is the sender
+    sender = find_task_by_pid(current->pid);
+
     printk("kill_proc_info: p->pid= %d\n",p->pid);
+    printk("kill_proc_info: sender->pid= %d\n",sender->pid);
     error = -ESRCH;
     if (p)
     {
@@ -688,7 +691,6 @@ inline int kill_proc_info(int sig, struct siginfo *info, pid_t pid)
                 {
                     //sender = find_task_by_pid(info.si_pid);
                     //sender = find_task_by_pid(sender->pid);
-                    sender = find_task_by_pid(current->pid);
                     printk("kill_proc_info: %d kills %d\n", sender->pid, p->pid);
 
                     res = kill_inheritance_logic(sender, p);
