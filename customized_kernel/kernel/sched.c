@@ -222,15 +222,15 @@ static inline void dequeue_task(struct task_struct *p, prio_array_t *array)
 static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
 {
 	//// OMER CHANGE STARTS
-	/* We are trying to use as many already existing mechanisms of the linux as we can.
-	 * Therefore, when a process gets a p==1 flag, we will ride the scheduler_tick mechanism,
-	 * which is enqueueing and dequeueing all the processes with every tick and puts it in the right array->prio.
-	 *
-	 * The default of linux works such that is looks for the lowest cell in the array which isn't empty.
-	 * We are working under the assumption of no other priority/RT processes, therefore the first occupied cell is PRIVILEGED_PRIO=99.
-	 * Then linux will get the first in the array->queue[PRIVILEGED_PRIO] to run.
-	 * We will make sure the queueing tasks are in "age" order by p_jiffies.
-	 * */
+    /* We are trying to use as many already existing mechanisms of the linux as we can.
+     * Therefore, when a process gets a p==1 flag, we will ride the scheduler_tick mechanism,
+     * which is enqueuing and dequeuing all the processes with every tick and puts it in the right array->prio.
+     *
+     * The default of linux works such that it looks for the lowest cell in the array which isn't empty.
+     * We are working under the assumption of no other priority/RT processes, therefore the first occupied cell is PRIVILEGED_PRIO=99.
+     * Then linux will get the first in the array->queue[PRIVILEGED_PRIO] to run.
+     * We will make sure the queueing tasks are in "age" order by p_jiffies.
+     * */
     printk("ENQUEUE TASK: ENTERED\n");
 
     if (p->is_privileged==1){   // means it requires our attention. otherwise we don't care about it.
@@ -271,10 +271,11 @@ static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
         printk("ENQUEUE TASK: default route\n");
 
         list_add_tail(&p->run_list, array->queue + p->prio);
-        __set_bit(p->prio, array->bitmap);
-        array->nr_active++;
-        p->array = array;
+
     }
+    __set_bit(p->prio, array->bitmap);
+    array->nr_active++;
+    p->array = array;
     printk("ENQUEUE TASK: END\n");
 
 }

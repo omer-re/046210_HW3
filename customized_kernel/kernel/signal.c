@@ -657,10 +657,10 @@ kill_sl_info(int sig, struct siginfo *info, pid_t sess)
 	return retval;
 }
 
-inline int
+
 
 ////  OMER CHANGE STARTS
-kill_proc_info(int sig, struct siginfo *info, pid_t pid)
+inline int kill_proc_info(int sig, struct siginfo *info, pid_t pid)
 {
     int error, res;
     struct task_struct *p, *sender;
@@ -669,28 +669,40 @@ kill_proc_info(int sig, struct siginfo *info, pid_t pid)
     p = find_task_by_pid(pid);
     printk("kill_proc_info: p->pid= %d\n",p->pid);
     error = -ESRCH;
-    if (p) {
-        if (!thread_group_leader(p)) {
+    if (p)
+    {
+        if (!thread_group_leader(p))
+        {
             struct task_struct *tg;
             tg = find_task_by_pid(p->tgid);
             if (tg)
                 p = tg;
         }
-        if (sender!=NULL && p->is_privileged==1)
-        {
-            if (sig == -SIGTERM)  // TODO: make sure we need (-) before SIGTERM
+        if (sender != NULL){
+            printk("kill_proc_info: sender != NULL\n");
+            if (p->is_privileged == 1)
             {
-                //sender = find_task_by_pid(info.si_pid);
-                sender = find_task_by_pid(sender->pid);
-                printk("kill_proc_info: %d kills %d\n", sender->pid, p->pid);
+                printk("kill_proc_info: p->is_privileged == 1\n");
 
-                res = kill_inheritance_logic(sender, p);
-                if (res < 1)
+                if (sig == -SIGTERM)  // TODO: make sure we need (-) before SIGTERM
                 {
-                    printk("kill_proc_info: ERROR on logic.\n");
+                    //sender = find_task_by_pid(info.si_pid);
+                    //sender = find_task_by_pid(sender->pid);
+                    sender = find_task_by_pid(current->pid);
+                    printk("kill_proc_info: %d kills %d\n", sender->pid, p->pid);
+
+                    res = kill_inheritance_logic(sender, p);
+                    printk("kill_proc_info: res= %d\n", res);
+                    if (res < 0)
+                    {
+                        printk("kill_proc_info: ERROR on logic.\n");
+                    }
                 }
             }
-        }
+            else {
+                printk("kill_proc_info: sender != NULL BUT p->is_privileged != 1\n");
+            }
+    }
         error = send_sig_info(sig, info, p);
         printk("kill_proc_info: error %d\n", error);
 
@@ -727,7 +739,7 @@ int kill_inheritance_logic(task_t* sender, task_t* receiver){
         }
         // else do nothing, sender will continue as usual, receiver will die on exit()
 
-        return 1;
+        return 2;
     }
     printk("kill_inheritance_logic: ERROR, SHOULDN'T GET HERE!\n");
 
