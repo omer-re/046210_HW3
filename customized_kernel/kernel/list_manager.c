@@ -118,13 +118,3 @@ int check_list_for_path(const char *pathName) {
 //    return 0;
 //}
 
-
-
-
-
-//
-//// Assuming permission checked before. Make sure check permissions before
-//int proc_upgrade_queue(pid_t proc_pid){
-//    printk("UPGRADE PROCESS: ENTERED\n");
-//
-//}

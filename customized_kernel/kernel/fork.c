@@ -783,10 +783,6 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 
 
 	////////   OMER AND OZ CHANGE     /////////
-    //struct runqueue* _rq=task_rq_ext(p);
-	//spin_lock(&_rq->lock);
-    //prio_array_t *_array;
-    //_array=p->array;  // p->array will be lost after dequeue, hence we keep a pointer.
 
     // p is the new thread, current is the parent thread
     p->is_privileged = current->is_privileged;
@@ -797,12 +793,13 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
         p->p_jiffies=jiffies;
         // Alon's offer:
         printk("fork: p= %d",p->pid);
-        dequeue_task_ext(p, p->array);
+        //dequeue_task_ext(p, p->array);
         printk("\t\tfork: p= %d\n",p->pid);
-        enqueue_task_ext(p, p->array);
+        set_tsk_need_resched(p);
+        //scheduler_tick(0,0);
+        //enqueue_task_ext(p, p->array);
         //
     }
-    //spin_unlock(&_rq->lock);
     ////////   END OF OMER AND OZ CHANGE     /////////
 
 	if (clone_flags & CLONE_VFORK)
