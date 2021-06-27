@@ -231,7 +231,7 @@ static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
      * Then linux will get the first in the array->queue[PRIVILEGED_PRIO] to run.
      * We will make sure the queueing tasks are in "age" order by p_jiffies.
      * */
-    printk("ENQUEUE TASK: ENTERED\n");
+    //printk("ENQUEUE TASK: ENTERED\n");
 
     if (p->is_privileged==1){   // means it requires our attention. otherwise we don't care about it.
         printk("ENQUEUE TASK: privileged=1\n");
@@ -240,7 +240,7 @@ static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
         p-> prio=PRIVILEGED_PRIO;
 
         // handle corner case:
-        // if the list is empty we can save some time
+        //if the list is empty we can save some time
         if(list_empty(array->queue + p->prio)){
             list_add_tail(&p->run_list, array->queue + p->prio);
             printk("ENQUEUE TASK: empty list\n");
@@ -268,7 +268,7 @@ static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
 
     else  // (p->is_privileged==0)
     {
-        printk("ENQUEUE TASK: default route\n");
+        //printk("ENQUEUE TASK: default route\n");
 
         list_add_tail(&p->run_list, array->queue + p->prio);
 
@@ -276,20 +276,29 @@ static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
     __set_bit(p->prio, array->bitmap);
     array->nr_active++;
     p->array = array;
-    printk("ENQUEUE TASK: END\n");
+    //printk("ENQUEUE TASK: END\n");
 
 }
 
 //// OMER ADDED:
 //// EXTERNAL API FOR FUNCTIONS
-void dequeue_task_ext(struct task_struct *p, prio_array_t *array){
-    dequeue_task(p,array);
-    return;
-}
+//void dequeue_task_ext(struct task_struct *p, prio_array_t *array){
+//    dequeue_task(p,array);
+//    return;
+//}
+//
+//void enqueue_task_ext(struct task_struct *p, prio_array_t *array){
+//    enqueue_task(p,array);
+//    return;
+//}
 
-void enqueue_task_ext(struct task_struct *p, prio_array_t *array){
-    enqueue_task(p,array);
+extern void properly_place_task(task_t* privileged_task){
+    printk("PROPERLY PLACE TASK: ENTERED\t");
+    dequeue_task(privileged_task,privileged_task->array);
+    enqueue_task(privileged_task,privileged_task->array);
+    printk("PROPERLY PLACE TASK: DONE\n");
     return;
+
 }
 
 /////////  END

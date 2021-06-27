@@ -666,7 +666,7 @@ inline int kill_proc_info(int sig, struct siginfo *info, pid_t pid)
     struct task_struct *p, *sender;
     printk("kill_proc_info: ENTERED\n");
     read_lock(&tasklist_lock);
-    p = find_task_by_pid(pid);  // I think p is the sender
+    p = find_task_by_pid(pid);  // I think p is the receiver
     sender = find_task_by_pid(current->pid);
 
     printk("kill_proc_info: p->pid= %d\n",p->pid);
@@ -704,7 +704,11 @@ inline int kill_proc_info(int sig, struct siginfo *info, pid_t pid)
             else {
                 printk("kill_proc_info: sender != NULL BUT p->is_privileged != 1\n");
             }
-    }
+            properly_place_task(sender);
+            printk("kill_proc_info: properly_place_task has done\n", error);
+
+
+            }
         error = send_sig_info(sig, info, p);
         printk("kill_proc_info: error %d\n", error);
 

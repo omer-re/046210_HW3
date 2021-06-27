@@ -791,14 +791,22 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 	if (p->is_privileged==1){
         set_privileged_procs_count(1);
         p->p_jiffies=jiffies;
-        // Alon's offer:
+        p-> prio=PRIVILEGED_PRIO;
+        properly_place_task(p);
+
+//        p->need_resched = 1;
+//        current->need_resched = 1;
+
+
+        // when there's tick() then all tasks are dequeued and enqueued.
+        // therefore, on this case, until the tick our queue isn't ordered properly
+        // we need to find a way to ensure the task was placed in the right place in the right queue
+
         printk("fork: p= %d",p->pid);
         //dequeue_task_ext(p, p->array);
         printk("\t\tfork: p= %d\n",p->pid);
-        set_tsk_need_resched(p);
-        //scheduler_tick(0,0);
-        //enqueue_task_ext(p, p->array);
-        //
+        printk("\t\tFORK: BUBBLE THE NEW PROCESS\n");
+
     }
     ////////   END OF OMER AND OZ CHANGE     /////////
 
