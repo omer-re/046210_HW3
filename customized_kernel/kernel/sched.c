@@ -303,16 +303,12 @@ extern void properly_place_task(task_t* privileged_task){
 
 }
 
-extern void activate_task_ext(task_t *p){
-    printk("ACTIVATE TASK: ENTERED\t");
-    activate_task(p, task_rq(p));
-    printk("ACTIVATE TASK: DONE\n");
-    return;
-}
-
-
-
-
+//extern void activate_task_ext(task_t *p){
+//    printk("ACTIVATE TASK: ENTERED\t");
+//    activate_task(p, task_rq(p));
+//    printk("ACTIVATE TASK: DONE\n");
+//    return;
+//}
 
 /////////  END
 

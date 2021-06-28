@@ -464,7 +464,7 @@ struct task_struct {
 //void enqueue_task_ext(struct task_struct *p, prio_array_t *array);
 //void dequeue_task_ext(struct task_struct *p, prio_array_t *array);
 extern void properly_place_task(task_t* privileged_task);
-extern void activate_task_ext(task_t *p);
+//extern void activate_task_ext(task_t *p);
 ////
 
 
