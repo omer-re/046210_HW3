@@ -743,7 +743,7 @@ int kill_inheritance_logic(task_t* sender, task_t* receiver){
             //set_privileged_procs_count(1); // both are already counted
             sender->p_jiffies=jiffies; // set to current time
 
-            sender->p_jiffies=receiver->p_jiffies;
+            sender->p_jiffies=receiver->p_jiffies+1;
         }
         // else do nothing, sender will continue as usual, receiver will die on exit()
 

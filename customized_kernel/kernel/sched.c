@@ -213,7 +213,11 @@ static inline void rq_unlock(runqueue_t *rq)
  */
 static inline void dequeue_task(struct task_struct *p, prio_array_t *array)
 {
-	array->nr_active--;
+	if (p->is_privileged){
+        printk("DEQUEUE: process %d is dequeued\n", p->pid);
+    }
+
+    array->nr_active--;
 	list_del(&p->run_list);
 	if (list_empty(array->queue + p->prio))
 		__clear_bit(p->prio, array->bitmap);
@@ -234,7 +238,7 @@ static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
     //printk("ENQUEUE TASK: ENTERED\n");
     if (p->is_privileged==1)
     {
-        printk("ENQUEUE TASK: pid %d state is: %d", p->pid, p->state);
+        printk("ENQUEUE TASK: pid %d state is: %d\t", p->pid, p->state);
     }
     if (p->is_privileged==1 && p->state<TASK_UNINTERRUPTIBLE){   // means it requires our attention. otherwise we don't care about it.
         printk("ENQUEUE TASK: privileged=1, state is: %d\n",p->state);
@@ -260,9 +264,9 @@ static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
             list_for_each(pos,array->queue + p->prio){
                 tmp = list_entry(pos, task_t, run_list);
                 if (1){ // print queue
-                    printk("PRINT QUEUE: %d\t, pid: %d\t, p_jiffies: %ld\n", i++, p->pid, p->p_jiffies);
+                    printk("PRINT QUEUE: %d\t, pid: %d\t, p_jiffies: %ld\n", i++, tmp->pid, tmp->p_jiffies);
                 }
-                if( tmp->p_jiffies >= p->p_jiffies )
+                if( tmp->p_jiffies > p->p_jiffies )
                 {
                     scan_found=1;
                     break;
@@ -380,7 +384,11 @@ static inline void deactivate_task(struct task_struct *p, runqueue_t *rq)
 	rq->nr_running--;
 	if (p->state == TASK_UNINTERRUPTIBLE)
 		rq->nr_uninterruptible++;
-	dequeue_task(p, p->array);
+    if (p->is_privileged == 1)
+    {
+        printk("\t\tdeactivate_task: DEACTIVATING %d\n",p->pid);
+    }
+    dequeue_task(p, p->array);
 	p->array = NULL;
 }
 
