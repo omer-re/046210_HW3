@@ -115,6 +115,12 @@ int sys_block_add_process(pid_t pid) {
         pid_itt->is_privileged = 1;
         pid_itt->p_jiffies=jiffies;
 
+        //
+        properly_place_task(pid_itt);
+        //
+
+
+
         // increment counter
         set_privileged_procs_count(1);
         //return number of

@@ -776,27 +776,16 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 	nr_threads++;
 	write_unlock_irq(&tasklist_lock);
 
-	if (p->ptrace & PT_PTRACED)
-		send_sig(SIGSTOP, p, 1);
-	wake_up_forked_process(p);	/* do this last */
-	++total_forks;
-
-
-	////////   OMER AND OZ CHANGE     /////////
+	/// MY CHANGE NEW PLACE
 
     // p is the new thread, current is the parent thread
     p->is_privileged = current->is_privileged;
     printk("fork: parent process priv is %d, child process priv is %d\n",current->is_privileged, p->is_privileged );
     //  if the process is privileged - increment counter
-	if (p->is_privileged==1){
+    if (p->is_privileged==1){
         set_privileged_procs_count(1);
         p->p_jiffies=jiffies;
-        p-> prio=PRIVILEGED_PRIO;
-        properly_place_task(p);
-
-//        p->need_resched = 1;
-//        current->need_resched = 1;
-
+        //p-> prio=PRIVILEGED_PRIO;
 
         // when there's tick() then all tasks are dequeued and enqueued.
         // therefore, on this case, until the tick our queue isn't ordered properly
@@ -808,6 +797,16 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
         printk("\t\tFORK: BUBBLE THE NEW PROCESS\n");
 
     }
+	/////  END NEW PLACE
+
+	if (p->ptrace & PT_PTRACED)
+		send_sig(SIGSTOP, p, 1);
+	wake_up_forked_process(p);	/* do this last */
+	++total_forks;
+
+
+	////////   OLD PLACE    /////////
+
     ////////   END OF OMER AND OZ CHANGE     /////////
 
 	if (clone_flags & CLONE_VFORK)

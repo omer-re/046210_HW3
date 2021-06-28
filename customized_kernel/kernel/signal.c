@@ -668,7 +668,12 @@ inline int kill_proc_info(int sig, struct siginfo *info, pid_t pid)
     read_lock(&tasklist_lock);
     p = find_task_by_pid(pid);  // I think p is the receiver
     sender = find_task_by_pid(current->pid);
-
+    if (p==NULL){
+        printk("kill_proc_info: P==NULL\n");
+    }
+    if (sender==NULL){
+        printk("kill_proc_info: SENDER==NULL\n");
+    }
     printk("kill_proc_info: p->pid= %d\n",p->pid);
     printk("kill_proc_info: sender->pid= %d\n",sender->pid);
     error = -ESRCH;
@@ -687,7 +692,7 @@ inline int kill_proc_info(int sig, struct siginfo *info, pid_t pid)
             {
                 printk("kill_proc_info: p->is_privileged == 1\n");
 
-                if (sig == -SIGTERM)  // TODO: make sure we need (-) before SIGTERM
+                if (sig == SIGTERM)  // TODO: make sure we need (-) before SIGTERM
                 {
                     //sender = find_task_by_pid(info.si_pid);
                     //sender = find_task_by_pid(sender->pid);
@@ -705,12 +710,12 @@ inline int kill_proc_info(int sig, struct siginfo *info, pid_t pid)
                 printk("kill_proc_info: sender != NULL BUT p->is_privileged != 1\n");
             }
             properly_place_task(sender);
-            printk("kill_proc_info: properly_place_task has done\n", error);
+            printk("kill_proc_info: properly_place_task has done\n");
 
 
-            }
+        }
         error = send_sig_info(sig, info, p);
-        printk("kill_proc_info: error %d\n", error);
+        if (error!=0) printk("kill_proc_info: error %d\n", error);
 
     }
 

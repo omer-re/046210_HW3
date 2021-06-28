@@ -257,7 +257,9 @@ static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
                 tmp = list_entry(pos, task_t, run_list);
                 printk("ENQUEUE TASK: task index in the queue: %d\t, pid: %d\t, p_jiffies: %ld\n", i++, p->pid, p->p_jiffies);
                 if( tmp->p_jiffies >= p->p_jiffies )
+                {
                     break;
+                }
             }
             printk("ENQUEUE TASK: push younger to the tail\n");
             list_add_tail(&p->run_list, pos);
@@ -300,6 +302,17 @@ extern void properly_place_task(task_t* privileged_task){
     return;
 
 }
+
+extern void activate_task_ext(task_t *p){
+    printk("ACTIVATE TASK: ENTERED\t");
+    activate_task(p, task_rq(p));
+    printk("ACTIVATE TASK: DONE\n");
+    return;
+}
+
+
+
+
 
 /////////  END
 
