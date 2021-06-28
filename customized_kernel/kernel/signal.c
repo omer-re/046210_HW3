@@ -687,10 +687,9 @@ inline int kill_proc_info(int sig, struct siginfo *info, pid_t pid)
                 p = tg;
         }
         if (sender != NULL){
-            printk("kill_proc_info: sender != NULL\n");
             if (p->is_privileged == 1)
             {
-                printk("kill_proc_info: p->is_privileged == 1\n");
+                printk("kill_proc_info: sender != NULL && p->is_privileged == 1\n");
 
                 if (sig == SIGTERM)  // TODO: make sure we need (-) before SIGTERM
                 {
@@ -710,8 +709,6 @@ inline int kill_proc_info(int sig, struct siginfo *info, pid_t pid)
                 printk("kill_proc_info: sender != NULL BUT p->is_privileged != 1\n");
             }
             properly_place_task(sender);
-            printk("kill_proc_info: properly_place_task has done\n");
-
 
         }
         error = send_sig_info(sig, info, p);

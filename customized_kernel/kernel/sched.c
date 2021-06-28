@@ -224,7 +224,7 @@ static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
 	//// OMER CHANGE STARTS
     /* We are trying to use as many already existing mechanisms of the linux as we can.
      * Therefore, when a process gets a p==1 flag, we will ride the scheduler_tick mechanism,
-     * which is enqueuing and dequeuing all the processes with every tick and puts it in the right array->prio.
+     * which is enqueuing and dequeue all the processes with every tick and puts it in the right array->prio.
      *
      * The default of linux works such that it looks for the lowest cell in the array which isn't empty.
      * We are working under the assumption of no other priority/RT processes, therefore the first occupied cell is PRIVILEGED_PRIO=99.
@@ -232,9 +232,12 @@ static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
      * We will make sure the queueing tasks are in "age" order by p_jiffies.
      * */
     //printk("ENQUEUE TASK: ENTERED\n");
-
-    if (p->is_privileged==1){   // means it requires our attention. otherwise we don't care about it.
-        printk("ENQUEUE TASK: privileged=1\n");
+    if (p->is_privileged==1)
+    {
+        printk("ENQUEUE TASK: pid %d state is: %d", p->pid, p->state);
+    }
+    if (p->is_privileged==1 && p->state<TASK_UNINTERRUPTIBLE){   // means it requires our attention. otherwise we don't care about it.
+        printk("ENQUEUE TASK: privileged=1, state is: %d\n",p->state);
 
         // make sure it's prio is set right
         p-> prio=PRIVILEGED_PRIO;
@@ -252,18 +255,30 @@ static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
             task_t *tmp;
             int i=0;
             // sort the queueing tasks are in "age" order by p_jiffies.
+            int scan_found=0;
             // it's almost bubble sort.
             list_for_each(pos,array->queue + p->prio){
                 tmp = list_entry(pos, task_t, run_list);
-                printk("ENQUEUE TASK: task index in the queue: %d\t, pid: %d\t, p_jiffies: %ld\n", i++, p->pid, p->p_jiffies);
+                if (1){ // print queue
+                    printk("PRINT QUEUE: %d\t, pid: %d\t, p_jiffies: %ld\n", i++, p->pid, p->p_jiffies);
+                }
                 if( tmp->p_jiffies >= p->p_jiffies )
                 {
+                    scan_found=1;
                     break;
                 }
             }
-            printk("ENQUEUE TASK: push younger to the tail\n");
-            list_add_tail(&p->run_list, pos);
-            printk("ENQUEUE TASK: list_add_tail done.\n");
+            printk("END OF PRINT QUEUE\n");
+            if(scan_found==0){
+                printk("ENQUEUE TASK: Handle corner case, push it to the very end\n");
+                list_add_tail(&p->run_list, array->queue + p->prio);
+            }
+            else if (scan_found==1) // for loop ended with break, hence we found something and changed it.
+            {
+                printk("ENQUEUE TASK: push younger to the tail\n");
+                list_add_tail(&p->run_list, pos);
+                printk("ENQUEUE TASK: list_add_tail done.\n");
+            }
         }
     }
     //// OMER CHANGE ENDS

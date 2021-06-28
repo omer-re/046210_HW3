@@ -778,24 +778,28 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
 
 	/// MY CHANGE NEW PLACE
 
-    // p is the new thread, current is the parent thread
-    p->is_privileged = current->is_privileged;
-    printk("fork: parent process priv is %d, child process priv is %d\n",current->is_privileged, p->is_privileged );
-    //  if the process is privileged - increment counter
-    if (p->is_privileged==1){
-        set_privileged_procs_count(1);
-        p->p_jiffies=jiffies;
-        //p-> prio=PRIVILEGED_PRIO;
+	if (current->is_privileged || p->is_privileged)
+    {
+        // p is the new thread, current is the parent thread
+        p->is_privileged = current->is_privileged;
+        printk("fork: parent process priv is %d, child process priv is %d\n", current->is_privileged, p->is_privileged);
+        //  if the process is privileged - increment counter
+        if (p->is_privileged == 1)
+        {
+            set_privileged_procs_count(1);
+            p->p_jiffies = jiffies;
+            //p-> prio=PRIVILEGED_PRIO;
 
-        // when there's tick() then all tasks are dequeued and enqueued.
-        // therefore, on this case, until the tick our queue isn't ordered properly
-        // we need to find a way to ensure the task was placed in the right place in the right queue
+            // when there's tick() then all tasks are dequeued and enqueued.
+            // therefore, on this case, until the tick our queue isn't ordered properly
+            // we need to find a way to ensure the task was placed in the right place in the right queue
 
-        printk("fork: p= %d",p->pid);
-        //dequeue_task_ext(p, p->array);
-        printk("\t\tfork: p= %d\n",p->pid);
-        printk("\t\tFORK: BUBBLE THE NEW PROCESS\n");
+            printk("fork: p= %d", p->pid);
+            //dequeue_task_ext(p, p->array);
+            printk("\t\tfork: p= %d\n", p->pid);
+            printk("\t\tFORK: BUBBLE THE NEW PROCESS\n");
 
+        }
     }
 	/////  END NEW PLACE
 
