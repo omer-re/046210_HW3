@@ -226,8 +226,8 @@ static inline void dequeue_task(struct task_struct *p, prio_array_t *array)
 static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
 {
 	//// OMER CHANGE STARTS
-    /* We are trying to use as many already existing mechanisms of the linux as we can.
-     * Therefore, when a process gets a p==1 flag, we will ride the scheduler_tick mechanism,
+    /* We are trying to use as many already  mechanisms of the linux as we can.
+     * Therefore, when a process gets a p==1 flag, wexistinge will ride the scheduler_tick mechanism,
      * which is enqueuing and dequeue all the processes with every tick and puts it in the right array->prio.
      *
      * The default of linux works such that it looks for the lowest cell in the array which isn't empty.
@@ -238,7 +238,7 @@ static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
     //printk("ENQUEUE TASK: ENTERED\n");
     if (p->is_privileged==1)
     {
-        printk("ENQUEUE TASK: pid %d state is: %d\t", p->pid, p->state);
+        printk("ENQUEUE TASK: pid %d state is, policy is %d: %d\t", p->pid, p->state, p->policy);
     }
     if (p->is_privileged==1 && p->state<TASK_UNINTERRUPTIBLE){   // means it requires our attention. otherwise we don't care about it.
         printk("ENQUEUE TASK: privileged=1, state is: %d\n",p->state);
@@ -251,6 +251,7 @@ static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
         if(list_empty(array->queue + p->prio)){
             list_add_tail(&p->run_list, array->queue + p->prio);
             printk("ENQUEUE TASK: empty list\n");
+            set_tsk_need_resched(current);
         }
         // else, if list isn't empty:
         else{
@@ -281,6 +282,8 @@ static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
             {
                 printk("ENQUEUE TASK: push younger to the tail\n");
                 list_add_tail(&p->run_list, pos);
+                set_tsk_need_resched(current);
+
                 printk("ENQUEUE TASK: list_add_tail done.\n");
             }
         }
@@ -314,10 +317,10 @@ static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
 //}
 
 extern void properly_place_task(task_t* privileged_task){
-    printk("PROPERLY PLACE TASK: ENTERED\t");
+    //printk("PROPERLY PLACE TASK: ENTERED\t");
     dequeue_task(privileged_task,privileged_task->array);
     enqueue_task(privileged_task,privileged_task->array);
-    printk("PROPERLY PLACE TASK: DONE\n");
+    //printk("PROPERLY PLACE TASK: DONE\n");
     return;
 
 }

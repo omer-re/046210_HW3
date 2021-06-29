@@ -144,6 +144,7 @@ int sys_block_add_process(pid_t pid) {
             set_privileged_procs_count(1);
             printk("sys_block_add_process: operation allowed due to no other privileged procs %d (should be 1)\n",
                    set_privileged_procs_count(0));
+            properly_place_task(pid_itt);
             return (set_privileged_procs_count(0));
         }
             //      else: deny

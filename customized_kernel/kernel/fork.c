@@ -787,7 +787,7 @@ int do_fork(unsigned long clone_flags, unsigned long stack_start,
         if (p->is_privileged == 1)
         {
             set_privileged_procs_count(1);
-            p->p_jiffies = jiffies;
+            p->p_jiffies = jiffies+1;
             //p-> prio=PRIVILEGED_PRIO;
 
             // when there's tick() then all tasks are dequeued and enqueued.

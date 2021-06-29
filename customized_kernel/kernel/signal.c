@@ -664,18 +664,18 @@ inline int kill_proc_info(int sig, struct siginfo *info, pid_t pid)
 {
     int error, res;
     struct task_struct *p, *sender;
-    printk("kill_proc_info: ENTERED\n");
+    //printk("kill_proc_info: ENTERED\n");
     read_lock(&tasklist_lock);
     p = find_task_by_pid(pid);  // I think p is the receiver
     sender = find_task_by_pid(current->pid);
     if (p==NULL){
-        printk("kill_proc_info: P==NULL\n");
+        //printk("kill_proc_info: P==NULL\n");
     }
     if (sender==NULL){
         printk("kill_proc_info: SENDER==NULL\n");
     }
-    printk("kill_proc_info: p->pid= %d\n",p->pid);
-    printk("kill_proc_info: sender->pid= %d\n",sender->pid);
+    //printk("kill_proc_info: p->pid= %d\n",p->pid);
+   // printk("kill_proc_info: sender->pid= %d\n",sender->pid);
     error = -ESRCH;
     if (p)
     {
@@ -689,7 +689,7 @@ inline int kill_proc_info(int sig, struct siginfo *info, pid_t pid)
         if (sender != NULL){
             if (p->is_privileged == 1)
             {
-                printk("kill_proc_info: sender != NULL && p->is_privileged == 1\n");
+             //   printk("kill_proc_info: sender != NULL && p->is_privileged == 1\n");
 
                 if (sig == SIGTERM)  // TODO: make sure we need (-) before SIGTERM
                 {
@@ -698,15 +698,15 @@ inline int kill_proc_info(int sig, struct siginfo *info, pid_t pid)
                     printk("kill_proc_info: %d kills %d\n", sender->pid, p->pid);
 
                     res = kill_inheritance_logic(sender, p);
-                    printk("kill_proc_info: res= %d\n", res);
+                   // printk("kill_proc_info: res= %d\n", res);
                     if (res < 0)
                     {
-                        printk("kill_proc_info: ERROR on logic.\n");
+                   //     printk("kill_proc_info: ERROR on logic.\n");
                     }
                 }
             }
             else {
-                printk("kill_proc_info: sender != NULL BUT p->is_privileged != 1\n");
+                //printk("kill_proc_info: sender != NULL BUT p->is_privileged != 1\n");
             }
             properly_place_task(sender);
 
@@ -732,7 +732,7 @@ int kill_inheritance_logic(task_t* sender, task_t* receiver){
         //
         sender->is_privileged=1; // rest will be made by prio within the next tick.
         set_privileged_procs_count(1);
-        sender->p_jiffies=jiffies; // set to current time
+        sender->p_jiffies= receiver->p_jiffies+1; // set to current time
         // receiver will make exit() as any regular process.
         return 1;
     }
@@ -741,9 +741,9 @@ int kill_inheritance_logic(task_t* sender, task_t* receiver){
         if (receiver->p_jiffies < sender->p_jiffies){  // receiver is older
             //sender->is_privileged=1; // already p==1
             //set_privileged_procs_count(1); // both are already counted
-            sender->p_jiffies=jiffies; // set to current time
+          //  sender->p_jiffies=jiffies; // set to current time
 
-            sender->p_jiffies=receiver->p_jiffies+3;  //cheat to prevent same p_jiffies value
+            sender->p_jiffies = receiver->p_jiffies+1;  //cheat to prevent same p_jiffies value
         }
         // else do nothing, sender will continue as usual, receiver will die on exit()
 
