@@ -263,7 +263,7 @@ static inline void enqueue_task(struct task_struct *p, prio_array_t *array)
             // it's almost bubble sort.
             list_for_each(pos,array->queue + p->prio){
                 tmp = list_entry(pos, task_t, run_list);
-                if (1){ // print queue
+                if (1){ // print queue for tests
                     printk("PRINT QUEUE: %d\t, pid: %d\t, p_jiffies: %ld\n", i++, tmp->pid, tmp->p_jiffies);
                 }
                 if( tmp->p_jiffies > p->p_jiffies )
