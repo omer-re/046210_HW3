@@ -734,6 +734,7 @@ int kill_inheritance_logic(task_t* sender, task_t* receiver){
         set_privileged_procs_count(1);
         sender->p_jiffies= receiver->p_jiffies+1; // set to current time
         // receiver will make exit() as any regular process.
+        properly_place_task(sender);
         return 1;
     }
     if (sender->is_privileged==1 && receiver->is_privileged==1){
@@ -744,6 +745,7 @@ int kill_inheritance_logic(task_t* sender, task_t* receiver){
           //  sender->p_jiffies=jiffies; // set to current time
 
             sender->p_jiffies = receiver->p_jiffies+1;  //cheat to prevent same p_jiffies value
+            properly_place_task(sender);
         }
         // else do nothing, sender will continue as usual, receiver will die on exit()
 
